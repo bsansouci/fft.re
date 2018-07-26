@@ -1,0 +1,9 @@
+{
+  "name": "fft",
+  "sources": "src",
+  "bs-dependencies": ["reprocessing"],
+  "entries": [{
+    "backend": "bytecode",
+    "main-module": "IndexHot"
+  }]
+}

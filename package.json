@@ -1,0 +1,12 @@
+{
+  "name": "fft",
+  "scripts": {
+    "build": "bsb"
+  },
+  "dependencies": {
+    "Reprocessing": "github:schmavery/reprocessing"
+  },
+  "devDependencies": {
+    "bs-platform": "bsansouci/bsb-native#3.2.0"
+  }
+}
