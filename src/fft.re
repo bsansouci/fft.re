@@ -101,13 +101,24 @@ let hammingWindow = (~reals) => {
   };
 };
 
+let getMaxAmplitude = (reals) => {
+  let maxAmplitude = ref(0.);
+  let size = BA.dim(reals);
+  for (i in 0 to size - 1) {
+    if (MyBigarray.Array1.get(reals, i) > maxAmplitude^) {
+      maxAmplitude := MyBigarray.Array1.get(reals, i);
+    };
+  };
+  maxAmplitude^
+};
+
 let generateSineInplace =
-    (~reals, ~imaginaries, ~frequency, ~samplingRate, ~size, ~offset=0., ()) => {
+    (~reals, ~imaginaries, ~frequency, ~samplingRate, ~size, ~offset=0., ~numberOfSines=1, ()) => {
   let samplingRatef = float_of_int(samplingRate);
   for (i in 0 to size - 1) {
     BA.set(reals, i, 0.);
     BA.set(imaginaries, i, 0.);
-    for (k in 0 to 20) {
+    for (k in 0 to numberOfSines - 1) {
       let coef = float_of_int(k * 2 + 1);
       BA.set(
         reals,
@@ -129,7 +140,7 @@ let generateSineInplace =
   };
 };
 
-let generateSine = (~frequency, ~samplingRate=256, ~size=256, ~offset=0., ()) => {
+let generateSine = (~frequency, ~samplingRate=256, ~size=256, ~offset=0., ~numberOfSines=1, ()) => {
   let reals = BA.create(MyBigarray.float64, MyBigarray.c_layout, size);
   let imaginaries = BA.create(MyBigarray.float64, MyBigarray.c_layout, size);
   generateSineInplace(
@@ -139,6 +150,7 @@ let generateSine = (~frequency, ~samplingRate=256, ~size=256, ~offset=0., ()) =>
     ~samplingRate,
     ~size,
     ~offset,
+    ~numberOfSines,
     (),
   );
   (reals, imaginaries);

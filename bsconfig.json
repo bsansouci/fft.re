@@ -10,7 +10,7 @@
   "bs-dependencies": ["reprocessing"],
   "entries": [{
     "backend": "bytecode",
-    "main-module": "IndexHot"
+    "main-module": "Index"
   }, {
     "backend": ["native", "js"],
     "main-module": "Index"

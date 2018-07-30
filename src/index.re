@@ -1,4 +1,30 @@
-let pi = 4.0 *. atan(1.0);
+let sum = ref(0.);
+let iterations = 10000;
+for (i in 0 to iterations - 1) {
+  let (reals, imaginaries) =
+      Fft.generateSine(
+        ~frequency=20.,
+        (),
+      );
+  let maxAmplitude = Fft.getMaxAmplitude(reals);
+  let prevTime = Unix.gettimeofday();
+  let spectrum =
+    Fft.fft(~reals, ~imaginaries, ~maxAmplitude, ());
+  sum := sum^ +. (Unix.gettimeofday() -. prevTime)
+};
+sum := sum^ /. float_of_int(iterations);
+Printf.printf("%fs\n", sum^);
+
+/*
+  For 2 arrays of floats:
+  time: 0.000244 s for 10,000 iterations
+
+  For using complex module:
+
+ */
+
+
+/*let pi = 4.0 *. atan(1.0);
 
 let fftBinSize = 1024;
 
@@ -59,15 +85,11 @@ let draw = (state, env) => {
       ~samplingRate,
       ~offset,
       ~size=fftBinSize,
+      ~numberOfSines=20,
       (),
     );
 
-  let maxAmplitude = ref(0.);
-  for (i in 0 to fftBinSize - 1) {
-    if (MyBigarray.Array1.get(reals, i) > maxAmplitude^) {
-      maxAmplitude := MyBigarray.Array1.get(reals, i);
-    };
-  };
+  let maxAmplitude = Fft.getMaxAmplitude(reals);
 
   if (state.hamming) {
     Fft.hammingWindow(~reals);
@@ -77,8 +99,7 @@ let draw = (state, env) => {
     Fft.hannWindow(~reals);
   };
 
-  let spectrum =
-    Fft.fft(~reals, ~imaginaries, ~maxAmplitude=maxAmplitude^, ());
+  let spectrum = Fft.fft(~reals, ~imaginaries, ~maxAmplitude, ());
 
   let (mx, _) = Env.mouse(env);
 
@@ -207,3 +228,4 @@ let draw = (state, env) => {
 };
 
 run(~setup, ~draw, ~mouseDown, ());
+*/
