@@ -1,9 +1,18 @@
 {
   "name": "fft",
-  "sources": "src",
+  "sources": {
+    "dir": "src",
+    "subdirs": {
+      "dir": "js",
+      "backend": "js"
+    }
+  },
   "bs-dependencies": ["reprocessing"],
   "entries": [{
     "backend": "bytecode",
     "main-module": "IndexHot"
+  }, {
+    "backend": ["native", "js"],
+    "main-module": "Index"
   }]
 }
