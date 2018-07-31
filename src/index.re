@@ -1,22 +1,26 @@
+/*[@bs.val] external now : unit => float = "Date.now";
+
 let sum = ref(0.);
-let iterations = 100;
+let iterations = 500;
 let hack = ref(0.);
 for (_ in 0 to iterations - 1) {
-  let data = Fft.generateSine2(
-    ~frequency=5000.,
-    ~samplingRate=131072,
-    ~size=131072,
+  let data = Fft.generateSine(
+    ~frequency=200.,
+    ~samplingRate=8192,
+    ~size=8192,
     ~numberOfSines=10,
     (),
   );
-  let maxAmplitude = Fft.getMaxAmplitude2(data);
-  let prevTime = Unix.gettimeofday();
-  let spectrum = Fft.fft2(~data, ~maxAmplitude, ());
+  let maxAmplitude = Fft.getMaxAmplitude(data);
+
+  Fft.hammingWindow(~data);
+  let prevTime = now();
+  let spectrum = Fft.fft(~data, ~maxAmplitude, ());
   hack := MyBigarray.Array1.get(spectrum, 0);
-  sum := sum^ +. (Unix.gettimeofday() -. prevTime);
+  sum := sum^ +. (now() -. prevTime);
 };
 sum := sum^ /. float_of_int(iterations);
-Printf.printf("%fs\n", sum^);
+Printf.printf("%f s\n", sum^ /. 1000.);*/
 
 /*
   For 2 arrays of floats
@@ -53,15 +57,15 @@ Printf.printf("%fs\n", sum^);
   Sampling rate: 131072Hz
   FFT bucket size: 131072 points
   Iterations: 100
-  Time take: 0.111438 sec/iteration (111.438 ms)
+  Time take: 0.108501 sec/iteration (108.501 ms)
  */
 
-/*let pi = 4.0 *. atan(1.0);
+  let pi = 4.0 *. atan(1.0);
 
-  let fftBinSize = 1024;
+  let fftBinSize = 256;
 
-  let frequency = 1.;
-  let samplingRate = 1024;
+  let frequency = 4.1;
+  let samplingRate = 256;
 
   open Reprocessing;
 
@@ -111,27 +115,27 @@ Printf.printf("%fs\n", sum^);
 
     let offset = state.time;
 
-    let (reals, imaginaries) =
+    let data =
       Fft.generateSine(
         ~frequency,
         ~samplingRate,
         ~offset,
         ~size=fftBinSize,
-        ~numberOfSines=20,
+        ~numberOfSines=1,
         (),
       );
 
-    let maxAmplitude = Fft.getMaxAmplitude(reals);
+    let maxAmplitude = Fft.getMaxAmplitude(data);
 
     if (state.hamming) {
-      Fft.hammingWindow(~reals);
+      Fft.hammingWindow(~data);
     };
 
     if (state.hann) {
-      Fft.hannWindow(~reals);
+      Fft.hannWindow(~data);
     };
 
-    let spectrum = Fft.fft(~reals, ~imaginaries, ~maxAmplitude, ());
+    let spectrum = Fft.fft(~data, ~maxAmplitude, ());
 
     let (mx, _) = Env.mouse(env);
 
@@ -219,15 +223,15 @@ Printf.printf("%fs\n", sum^);
         padding +. float_of_int(i - 1) *. 2.,
         150.
         +. MyBigarray.Array1.get(
-             reals,
+             data,
              int_of_float((f -. 1.) *. timeWindowSeconds),
-           )
+           ).Complex.re
         *. 100.,
       );
       let cur = (
         padding +. float_of_int(i) *. 2.,
         150.
-        +. MyBigarray.Array1.get(reals, int_of_float(f *. timeWindowSeconds))
+        +. MyBigarray.Array1.get(data, int_of_float(f *. timeWindowSeconds)).Complex.re
         *. 100.,
       );
       Draw.linef(~p1=prev, ~p2=cur, env);
@@ -260,4 +264,6 @@ Printf.printf("%fs\n", sum^);
   };
 
   run(~setup, ~draw, ~mouseDown, ());
-  */
+
+
+
