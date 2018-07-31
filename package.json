@@ -5,7 +5,8 @@
     "build:web": "bsb -make-world -backend js"
   },
   "devDependencies": {
-    "Reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",
-    "bs-platform": "bsansouci/bsb-native#3.2.0"
+    "reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",
+    "bs-platform": "bsansouci/bsb-native#3.2.0",
+    "reprocessing-ui": "bsansouci/reprocessing-ui"
   }
 }
