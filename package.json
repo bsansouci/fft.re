@@ -3,11 +3,14 @@
   "scripts": {
     "build": "bsb -make-world -backend bytecode",
     "build:native": "bsb -make-world -backend native",
-    "build:web": "bsb -make-world -backend js"
+    "build:web": "bsb -make-world -backend js",
+    "bundle": "rollup -c"
   },
   "devDependencies": {
-    "reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",
+    "Reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",
+    "reprocessing-ui": "bsansouci/reprocessing-ui",
     "bs-platform": "bsansouci/bsb-native#3.2.0",
-    "reprocessing-ui": "bsansouci/reprocessing-ui"
+    "rollup": "^0.63.4",
+    "rollup-plugin-node-resolve": "^3.3.0"
   }
 }
