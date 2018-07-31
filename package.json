@@ -1,7 +1,8 @@
 {
   "name": "fft",
   "scripts": {
-    "build": "bsb -make-world -backend js"
+    "build": "bsb -make-world -backend native",
+    "build:web": "bsb -make-world -backend js"
   },
   "devDependencies": {
     "Reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",

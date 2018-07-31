@@ -1,12 +1,12 @@
 {
   "name": "fft",
-  "sources": {
+  "sources": ["example", {
     "dir": "src",
     "subdirs": {
       "dir": "js",
       "backend": "js"
     }
-  },
+  }],
   "bs-dependencies": ["reprocessing"],
   "entries": [{
     "backend": "bytecode",

@@ -1,4 +1,4 @@
-# Simple FFT
+# fft.re
 
 This is a simple Cooley-Tukey FFT implementation ported from https://gist.github.com/mbitsnbites/a065127577ff89ff885dd0a932ec2477.
 
