@@ -64,14 +64,24 @@ let getMaxAmplitude = (~data : MyBigarray.t(Complex.t)) => Complex.t
 
 #### hammingWindow
 Mutates the data passed, applying a Hamming window to it.
+`amount` is used to tweak how much to apply the windowing function onto the signal, and is a number between 0 and 1.
 ```reason
-let hammingWindow = (~data : MyBigarray.t(Complex.t)) => unit
+let hammingWindow = (
+  ~data : MyBigarray.t(Complex.t), 
+  ~amount=1. : float, 
+  () : unit
+) => unit
 ```
 
 #### hannWindow
-Mutates the data passed, applying a Hann window to it.
+Mutates the data passed, applying a Hann window to it. 
+`amount` is used to tweak how much to apply the windowing function onto the signal, and is a number between 0 and 1.
 ```reason
-let hannWindow = (~data : MyBigarray.t(Complex.t)) => unit
+let hannWindow = (
+  ~data : MyBigarray.t(Complex.t)
+  ~amount=1. : float,
+  () : unit
+) => unit
 ```
 
 #### fftInplace

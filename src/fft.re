@@ -66,7 +66,7 @@ let fft = (~data, ~maxAmplitude, ()) => {
   spectrum;
 };
 
-let hannWindow = (~data) => {
+let hannWindow = (~data, ~amount=1., ()) => {
   let bucketSize = BA.dim(data);
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
@@ -75,12 +75,20 @@ let hannWindow = (~data) => {
     BA.unsafe_set(
       data,
       i,
-      {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im},
+      {
+        Complex.re:
+          (1. -. amount)
+          *. com.Complex.re
+          +. amount
+          *. com.Complex.re
+          *. multiplier,
+        im: com.Complex.im,
+      },
     );
   };
 };
 
-let hammingWindow = (~data) => {
+let hammingWindow = (~data, ~amount=1., ()) => {
   let bucketSize = BA.dim(data);
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
@@ -89,7 +97,15 @@ let hammingWindow = (~data) => {
     BA.unsafe_set(
       data,
       i,
-      {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im},
+      {
+        Complex.re:
+          (1. -. amount)
+          *. com.Complex.re
+          +. amount
+          *. com.Complex.re
+          *. multiplier,
+        im: com.Complex.im,
+      },
     );
   };
 };
