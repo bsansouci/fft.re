@@ -23,10 +23,11 @@ let rec fftInplace = complex => {
     let x = cos(a);
     let y = sin(a);
     let com = BA.unsafe_get(oddElements, k);
-    let new_com = Complex.{
-      re: x *. com.re -. y *. com.im,
-      im: x *. com.im +. y *. com.re
-    };
+    let new_com =
+      Complex.{
+        re: x *. com.re -. y *. com.im,
+        im: x *. com.im +. y *. com.re,
+      };
     let c = BA.unsafe_get(evenElements, k);
     BA.unsafe_set(complex, k, Complex.add(c, new_com));
     BA.unsafe_set(complex, k + m, Complex.sub(c, new_com));
@@ -69,12 +70,13 @@ let hannWindow = (~data) => {
   let bucketSize = BA.dim(data);
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
-    let multiplier =
-      0.5
-      -. 0.5
-      *. cos(two_pi *. float_of_int(i) /. total);
+    let multiplier = 0.5 -. 0.5 *. cos(two_pi *. float_of_int(i) /. total);
     let com = BA.unsafe_get(data, i);
-    BA.unsafe_set(data, i, {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im});
+    BA.unsafe_set(
+      data,
+      i,
+      {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im},
+    );
   };
 };
 
@@ -82,12 +84,13 @@ let hammingWindow = (~data) => {
   let bucketSize = BA.dim(data);
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
-    let multiplier =
-      0.54
-      -. 0.46
-      *. cos(two_pi *. float_of_int(i) /. total);
+    let multiplier = 0.54 -. 0.46 *. cos(two_pi *. float_of_int(i) /. total);
     let com = BA.unsafe_get(data, i);
-    BA.unsafe_set(data, i, {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im});
+    BA.unsafe_set(
+      data,
+      i,
+      {Complex.re: com.Complex.re *. multiplier, im: com.Complex.im},
+    );
   };
 };
 
@@ -103,16 +106,8 @@ let getMaxAmplitude = data => {
   maxAmplitude^;
 };
 
-
 let generateSineInplace =
-    (
-      ~data,
-      ~frequency,
-      ~samplingRate,
-      ~offset=0.,
-      ~numberOfSines=1,
-      (),
-    ) => {
+    (~data, ~frequency, ~samplingRate, ~offset=0., ~numberOfSines=1, ()) => {
   let size = BA.dim(data);
   let samplingRatef = float_of_int(samplingRate);
   for (i in 0 to size - 1) {
@@ -143,7 +138,7 @@ let generateSine =
       ~samplingRate=256,
       ~size=256,
       ~offset=0.,
-      ~numberOfSines=20,
+      ~numberOfSines=1,
       (),
     ) => {
   let data = BA.create(MyBigarray.complex64, MyBigarray.c_layout, size);
