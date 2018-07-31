@@ -58,28 +58,30 @@ function fft(data, maxAmplitude, _) {
   return spectrum;
 }
 
-function hannWindow(data) {
+function hannWindow(data, $staropt$star, _) {
+  var amount = $staropt$star ? $staropt$star[0] : 1;
   var bucketSize = data.length;
   var total = bucketSize - 1 | 0;
   for(var i = 0 ,i_finish = bucketSize - 1 | 0; i <= i_finish; ++i){
     var multiplier = 0.5 - 0.5 * Math.cos(two_pi * i / total);
     var com = data[i];
     data[i] = /* record */[
-      /* re */com[/* re */0] * multiplier,
+      /* re */(1 - amount) * com[/* re */0] + amount * com[/* re */0] * multiplier,
       /* im */com[/* im */1]
     ];
   }
   return /* () */0;
 }
 
-function hammingWindow(data) {
+function hammingWindow(data, $staropt$star, _) {
+  var amount = $staropt$star ? $staropt$star[0] : 1;
   var bucketSize = data.length;
   var total = bucketSize - 1 | 0;
   for(var i = 0 ,i_finish = bucketSize - 1 | 0; i <= i_finish; ++i){
     var multiplier = 0.54 - 0.46 * Math.cos(two_pi * i / total);
     var com = data[i];
     data[i] = /* record */[
-      /* re */com[/* re */0] * multiplier,
+      /* re */(1 - amount) * com[/* re */0] + amount * com[/* re */0] * multiplier,
       /* im */com[/* im */1]
     ];
   }
