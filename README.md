@@ -85,37 +85,37 @@ let fftInplace = (data : MyBigarray.t(Complex.t)) => unit
 The following benchmarks were done in native.
 
 For 2 arrays of floats
-Sampling rate: 256Hz
-FFT bucket size: 256 points
-Iterations: 10,000
-Time taken: 0.000244 sec/iteration (0.244 ms)
+- Sampling rate: 256Hz
+- FFT bucket size: 256 points
+- Iterations: 10,000
+- Time taken: 0.000244 sec/iteration (0.244 ms)
 
 Using complex module:
-Sampling rate: 256Hz
-FFT bucket size: 256 points
-Iterations: 10,000
-Time taken: 0.000150 sec/iteration (0.150 ms)
+- Sampling rate: 256Hz
+- FFT bucket size: 256 points
+- Iterations: 10,000
+- Time taken: 0.000150 sec/iteration (0.150 ms)
 
 Using complex module:
-Sampling rate: 2048Hz
-FFT bucket size: 2048 points
-Iterations: 500
-Time take: 0.001471 sec/iteration (1.471 ms)
+- Sampling rate: 2048Hz
+- FFT bucket size: 2048 points
+- Iterations: 500
+- Time take: 0.001471 sec/iteration (1.471 ms)
 
 Using complex module:
-Sampling rate: 8192Hz
-FFT bucket size: 8192 points
-Iterations: 500
-Time take: 0.006063 sec/iteration (6.063 ms)
+- Sampling rate: 8192Hz
+- FFT bucket size: 8192 points
+- Iterations: 500
+- Time take: 0.006063 sec/iteration (6.063 ms)
 
 Using complex module (with global and mutable bigarray bucket):
-Sampling rate: 8192Hz
-FFT bucket size: 8192 points
-Iterations: 500
-Time take: 0.005910 sec/iteration (5.91 ms)
+- Sampling rate: 8192Hz
+- FFT bucket size: 8192 points
+- Iterations: 500
+- Time take: 0.005910 sec/iteration (5.91 ms)
 
 Using complex module:
-Sampling rate: 131072Hz
-FFT bucket size: 131072 points
-Iterations: 100
-Time take: 0.108501 sec/iteration (108.501 ms)
+- Sampling rate: 131072Hz
+- FFT bucket size: 131072 points
+- Iterations: 100
+- Time take: 0.108501 sec/iteration (108.501 ms)
