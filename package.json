@@ -1,7 +1,7 @@
 {
   "name": "fft",
   "scripts": {
-    "build": "bsb -make-world -backend native",
+    "build": "bsb -make-world -backend bytecode",
     "build:web": "bsb -make-world -backend js"
   },
   "devDependencies": {

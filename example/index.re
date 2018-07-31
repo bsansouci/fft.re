@@ -1,7 +1,6 @@
 let pi = 4.0 *. atan(1.0);
 
 let fftBinSize = 8192;
-
 let frequency = 15.1;
 let samplingRate = 8192;
 
@@ -9,49 +8,25 @@ open Reprocessing;
 
 type state = {
   time: float,
-  checked: imageT,
-  unchecked: imageT,
-  hamming: bool,
-  hann: bool,
+  hamming: UI.checkboxT,
+  hann: UI.checkboxT,
 };
 
 let setup = env => {
   Env.size(~width=1000, ~height=600, env);
   Draw.strokeCap(Square, env);
-  {
-    time: 0.,
-    checked: Draw.loadImage(~filename="assets/checked.png", env),
-    unchecked: Draw.loadImage(~filename="assets/unchecked.png", env),
-    hamming: false,
-    hann: false,
-  };
+  {time: 0., hamming: UI.makeCheckbox(env), hann: UI.makeCheckbox(env)};
 };
 
 let (hammingX, hammingY) = (700, 100);
 let (hannX, hannY) = (700, 160);
-
-let mouseDown = (state, env) => {
-  let (mx, my) = Env.mouse(env);
-  if (mx > hammingX
-      && mx < hammingX
-      + 28
-      && my > hammingY
-      && my < hammingY
-      + 28) {
-    {...state, hamming: ! state.hamming};
-  } else if (mx > hannX && mx < hannX + 28 && my > hannY && my < hannY + 28) {
-    {...state, hann: ! state.hann};
-  } else {
-    state;
-  };
-};
 
 let prevDeltaTime = ref(0.);
 let draw = (state, env) => {
   Draw.background(Utils.color(~r=199, ~g=217, ~b=229, ~a=255), env);
   let dt = Env.deltaTime(env);
 
-  let offset = state.time;
+  let offset = state.time /. 10.;
 
   let data =
     Fft.generateSine(
@@ -65,81 +40,82 @@ let draw = (state, env) => {
 
   let maxAmplitude = Fft.getMaxAmplitude(data);
 
-  if (state.hamming) {
-    Fft.hammingWindow(~data);
+  switch (state.hamming.animationState) {
+  | CheckedToUnchecked =>
+    Fft.hammingWindow(
+      ~data,
+      ~amount=
+        Utils.remapf(
+          ~value=state.hamming.time,
+          ~low1=0.,
+          ~high1=state.hamming.animationTime,
+          ~low2=1.,
+          ~high2=0.,
+        ),
+      (),
+    )
+  | UncheckedToChecked =>
+    Fft.hammingWindow(
+      ~data,
+      ~amount=
+        Utils.remapf(
+          ~value=state.hamming.time,
+          ~low1=0.,
+          ~high1=state.hamming.animationTime,
+          ~low2=0.,
+          ~high2=1.,
+        ),
+      (),
+    )
+  | Nothing when state.hamming.checked => Fft.hammingWindow(~data, ())
+  | _ => ()
   };
 
-  if (state.hann) {
-    Fft.hannWindow(~data);
+  switch (state.hann.animationState) {
+  | CheckedToUnchecked =>
+    Fft.hannWindow(
+      ~data,
+      ~amount=
+        Utils.remapf(
+          ~value=state.hann.time,
+          ~low1=0.,
+          ~high1=state.hann.animationTime,
+          ~low2=1.,
+          ~high2=0.,
+        ),
+      (),
+    )
+  | UncheckedToChecked =>
+    Fft.hannWindow(
+      ~data,
+      ~amount=
+        Utils.remapf(
+          ~value=state.hann.time,
+          ~low1=0.,
+          ~high1=state.hann.animationTime,
+          ~low2=0.,
+          ~high2=1.,
+        ),
+      (),
+    )
+  | Nothing when state.hann.checked => Fft.hannWindow(~data, ())
+  | _ => ()
   };
 
   let spectrum = Fft.fft(~data, ~maxAmplitude, ());
 
-  let (mx, _) = Env.mouse(env);
-
-  {
-    if (state.hamming) {
-      Draw.image(state.checked, ~pos=(hammingX, hammingY), env);
-    } else {
-      /*   let width = 1.;
-           Draw.strokeCap(Round, env);
-           Draw.strokeWeight(2, env);
-           Draw.stroke(Utils.color(0, 0, 0, 255), env);
-           Draw.fill(Utils.color(0, 0, 0, 255), env);
-           Draw.rect(~pos=(hammingX, hammingY), ~width=18, ~height=18, env);
-           Draw.strokeWeight(2, env);
-           Draw.stroke(Utils.color(189, 189, 189, 255), env);
-           Draw.fill(Utils.color(189, 189, 189, 255), env);
-           Draw.rectf(
-             ~pos=(
-               float_of_int(hammingX) +. width /. 2.,
-               float_of_int(hammingY) +. width /. 2.,
-             ),
-             ~width=18. -. width,
-             ~height=18. -. width,
-             env,
-           );*/
-      Draw.image(
-        state.unchecked,
-        ~pos=(hammingX, hammingY),
-        env,
-      );
-    };
+  /* Hamming option */
+  let hamming = {
     Draw.text(~body="Hamming window", ~pos=(738, 100), env);
+    UI.drawCheckbox(~checkbox=state.hamming, ~pos=(hammingX, hammingY), env);
   };
 
   /* Hann option */
-  {
-    if (state.hann) {
-      Draw.image(state.checked, ~pos=(hannX, hannY), env);
-    } else {
-      /*   let width = 1.;
-           Draw.strokeCap(Round, env);
-           Draw.strokeWeight(2, env);
-           Draw.stroke(Utils.color(0, 0, 0, 255), env);
-           Draw.fill(Utils.color(0, 0, 0, 255), env);
-           Draw.rect(~pos=(hannX, hannY), ~width=18, ~height=18, env);
-           Draw.strokeWeight(2, env);
-           Draw.stroke(Utils.color(189, 189, 189, 255), env);
-           Draw.fill(Utils.color(189, 189, 189, 255), env);
-           Draw.rectf(
-             ~pos=(
-               float_of_int(hannX) +. width /. 2.,
-               float_of_int(hannY) +. width /. 2.,
-             ),
-             ~width=18. -. width,
-             ~height=18. -. width,
-             env,
-           );*/
-      Draw.image(
-        state.unchecked,
-        ~pos=(hannX, hannY),
-        env,
-      );
-    };
-
+  let hann = {
     Draw.text(~body="Hann window", ~pos=(738, 160), env);
+    UI.drawCheckbox(~checkbox=state.hann, ~pos=(hannX, hannY), env);
   };
+  let (mx, _) = Env.mouse(env);
 
   let padding = 10.;
   let bucketSize = 5.;
@@ -198,7 +174,7 @@ let draw = (state, env) => {
       env,
     );
   };
-  {...state, time: state.time +. dt};
+  {...state, time: state.time +. dt, hann, hamming};
 };
 
-run(~setup, ~draw, ~mouseDown, ());
+run(~setup, ~draw, ());
