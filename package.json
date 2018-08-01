@@ -4,7 +4,7 @@
     "build": "bsb -make-world -backend bytecode",
     "build:native": "bsb -make-world -backend native",
     "build:web": "bsb -make-world -backend js",
-    "bundle": "rollup -c"
+    "bundle": "bsb -clean-world -make-world -backend js && rollup -c"
   },
   "devDependencies": {
     "Reprocessing": "github:schmavery/reprocessing#multifile-hotreloading",

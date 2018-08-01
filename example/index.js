@@ -32,50 +32,30 @@ function draw(state, env) {
   var data = Fft.generateSine(15.1, /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[20], /* () */0);
   var maxAmplitude = Fft.getMaxAmplitude(data);
   var match = state[/* hamming */1][/* animationState */2];
-  switch (match) {
-    case 0 : 
-        Fft.hammingWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 1, 0)], /* () */0);
-        break;
-    case 1 : 
-        Fft.hammingWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 0, 1)], /* () */0);
-        break;
-    case 2 : 
-        if (state[/* hamming */1][/* checked */3]) {
-          Fft.hammingWindow(data, /* None */0, /* () */0);
-        }
-        break;
+  if (match >= 2) {
+    if (state[/* hamming */1][/* checked */3]) {
+      Fft.hammingWindow(data, /* None */0, /* () */0);
+    }
     
+  } else {
+    Fft.hammingWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 0, 1)], /* () */0);
   }
   var match$1 = state[/* hann */2][/* animationState */2];
-  switch (match$1) {
-    case 0 : 
-        Fft.hannWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 1, 0)], /* () */0);
-        break;
-    case 1 : 
-        Fft.hannWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 0, 1)], /* () */0);
-        break;
-    case 2 : 
-        if (state[/* hann */2][/* checked */3]) {
-          Fft.hannWindow(data, /* None */0, /* () */0);
-        }
-        break;
+  if (match$1 >= 2) {
+    if (state[/* hann */2][/* checked */3]) {
+      Fft.hannWindow(data, /* None */0, /* () */0);
+    }
     
+  } else {
+    Fft.hannWindow(data, /* Some */[Reprocessing_Utils.remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 0, 1)], /* () */0);
   }
   var spectrum = Fft.fft(data, maxAmplitude, /* () */0);
-  Reprocessing_Draw.text(/* None */0, "Hamming window", /* tuple */[
-        738,
+  var hamming = UI.drawCheckbox(state[/* hamming */1], /* Some */["Hamming Window"], /* tuple */[
+        600,
         100
       ], env);
-  var hamming = UI.drawCheckbox(state[/* hamming */1], /* tuple */[
-        700,
-        100
-      ], env);
-  Reprocessing_Draw.text(/* None */0, "Hann window", /* tuple */[
-        738,
-        160
-      ], env);
-  var hann = UI.drawCheckbox(state[/* hann */2], /* tuple */[
-        700,
+  var hann = UI.drawCheckbox(state[/* hann */2], /* Some */["Hann window"], /* tuple */[
+        600,
         160
       ], env);
   var match$2 = Reprocessing_Env.mouse(env);
@@ -149,11 +129,11 @@ var frequency = 15.1;
 
 var samplingRate = 8192;
 
-var hammingX = 700;
+var hammingX = 600;
 
 var hammingY = 100;
 
-var hannX = 700;
+var hannX = 600;
 
 var hannY = 160;
 

@@ -8090,6 +8090,10 @@ var MyBundle = (function (exports) {
     return Font[/* drawString */13](env, font, body, param[0], param[1]);
   }
 
+  function textWidth(font, body, env) {
+    return Font[/* calcStringWidth */14](env, font, body) | 0;
+  }
+
   function clear(env) {
     return _2(Gl[/* clear */45], env[/* gl */2], color_buffer_bit | depth_buffer_bit);
   }
@@ -8658,25 +8662,46 @@ var MyBundle = (function (exports) {
     return tint(color(255, 255, 255, remapf(alpha, 0, 1, 0, 255) | 0), env);
   }
 
-  function drawCheckbox(checkbox, pos, env) {
+  function drawCheckbox(checkbox, $staropt$star, pos, env) {
     var y = pos[1];
     var x = pos[0];
+    var text$$1 = $staropt$star ? $staropt$star[0] : "";
     var match = mouse(env);
     var my = match[1];
     var mx = match[0];
     var pressDown = mousePressed(env);
-    var withinBounds = mx > x && mx < (x + 28 | 0) && my > y && my < (y + 28 | 0);
+    var textWidth$$1 = textWidth(/* None */0, text$$1, env);
+    var withinBounds = mx > x && mx < ((x + 28 | 0) + textWidth$$1 | 0) && my > y && my < (y + 28 | 0);
     var clicked = checkbox[/* prevPressDown */6] && !pressDown && withinBounds;
+    if (text$$1 !== "") {
+      text(/* None */0, text$$1, /* tuple */[
+            (x + 28 | 0) + 12 | 0,
+            y
+          ], env);
+    }
     var match$1 = checkbox[/* animationState */2];
-    var exit = 0;
     if (clicked) {
       switch (match$1) {
         case 0 : 
-            exit = 1;
-            break;
+            return /* record */[
+                    /* checkedImage */checkbox[/* checkedImage */0],
+                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                    /* animationState : UncheckedToChecked */1,
+                    /* checked */true,
+                    /* time */0,
+                    /* animationTime */checkbox[/* animationTime */5],
+                    /* prevPressDown */pressDown
+                  ];
         case 1 : 
-            exit = 2;
-            break;
+            return /* record */[
+                    /* checkedImage */checkbox[/* checkedImage */0],
+                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                    /* animationState : CheckedToUnchecked */0,
+                    /* checked */false,
+                    /* time */checkbox[/* animationTime */5],
+                    /* animationTime */checkbox[/* animationTime */5],
+                    /* prevPressDown */pressDown
+                  ];
         case 2 : 
             if (checkbox[/* checked */3]) {
               image(checkbox[/* checkedImage */0], pos, /* Some */[28], /* Some */[28], env);
@@ -8706,11 +8731,79 @@ var MyBundle = (function (exports) {
     } else {
       switch (match$1) {
         case 0 : 
-            exit = 1;
-            break;
+            var remapedTime = remapf(checkbox[/* time */4], checkbox[/* animationTime */5], 0, 0, 1);
+            image(checkbox[/* uncheckedImage */1], pos, /* Some */[28], /* Some */[28], env);
+            pushMatrix(env);
+            opacity(remapf(remapedTime, 0, 1, 1, 0), env);
+            var scale = remapf(remapedTime, 0, 1, 1, 0.8);
+            var scaledSize = 28 / 2 * scale;
+            translate$4(x + scaledSize, y + scaledSize, env);
+            scale$9(scale, scale, env);
+            translate$4(-scaledSize, -scaledSize, env);
+            image(checkbox[/* checkedImage */0], /* tuple */[
+                  0,
+                  0
+                ], /* Some */[28], /* Some */[28], env);
+            popMatrix(env);
+            opacity(1, env);
+            if (checkbox[/* time */4] <= 0) {
+              return /* record */[
+                      /* checkedImage */checkbox[/* checkedImage */0],
+                      /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                      /* animationState : Nothing */2,
+                      /* checked */checkbox[/* checked */3],
+                      /* time */0,
+                      /* animationTime */checkbox[/* animationTime */5],
+                      /* prevPressDown */pressDown
+                    ];
+            } else {
+              return /* record */[
+                      /* checkedImage */checkbox[/* checkedImage */0],
+                      /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                      /* animationState */checkbox[/* animationState */2],
+                      /* checked */checkbox[/* checked */3],
+                      /* time */caml_float_max(checkbox[/* time */4] - deltaTime(env), 0),
+                      /* animationTime */checkbox[/* animationTime */5],
+                      /* prevPressDown */pressDown
+                    ];
+            }
         case 1 : 
-            exit = 2;
-            break;
+            var remapedTime$1 = remapf(checkbox[/* time */4], 0, checkbox[/* animationTime */5], 0, 1);
+            image(checkbox[/* uncheckedImage */1], pos, /* Some */[28], /* Some */[28], env);
+            opacity(remapf(remapedTime$1, 0, 1, 0, 1), env);
+            pushMatrix(env);
+            var scale$1 = remapf(remapedTime$1, 0, 1, 0.8, 1);
+            var scaledSize$1 = 28 / 2 * scale$1;
+            translate$4(x + scaledSize$1, y + scaledSize$1, env);
+            scale$9(scale$1, scale$1, env);
+            translate$4(-scaledSize$1, -scaledSize$1, env);
+            image(checkbox[/* checkedImage */0], /* tuple */[
+                  0,
+                  0
+                ], /* Some */[28], /* Some */[28], env);
+            popMatrix(env);
+            opacity(1, env);
+            if (checkbox[/* time */4] >= checkbox[/* animationTime */5]) {
+              return /* record */[
+                      /* checkedImage */checkbox[/* checkedImage */0],
+                      /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                      /* animationState : Nothing */2,
+                      /* checked */checkbox[/* checked */3],
+                      /* time */checkbox[/* animationTime */5],
+                      /* animationTime */checkbox[/* animationTime */5],
+                      /* prevPressDown */pressDown
+                    ];
+            } else {
+              return /* record */[
+                      /* checkedImage */checkbox[/* checkedImage */0],
+                      /* uncheckedImage */checkbox[/* uncheckedImage */1],
+                      /* animationState */checkbox[/* animationState */2],
+                      /* checked */checkbox[/* checked */3],
+                      /* time */caml_float_min(checkbox[/* time */4] + deltaTime(env), checkbox[/* animationTime */5]),
+                      /* animationTime */checkbox[/* animationTime */5],
+                      /* prevPressDown */pressDown
+                    ];
+            }
         case 2 : 
             if (checkbox[/* checked */3]) {
               image(checkbox[/* checkedImage */0], pos, /* Some */[28], /* Some */[28], env);
@@ -8728,81 +8821,6 @@ var MyBundle = (function (exports) {
                   ];
         
       }
-    }
-    switch (exit) {
-      case 1 : 
-          image(checkbox[/* uncheckedImage */1], pos, /* Some */[28], /* Some */[28], env);
-          pushMatrix(env);
-          opacity(remapf(checkbox[/* time */4], 0, checkbox[/* animationTime */5], 1, 0), env);
-          var scale = remapf(checkbox[/* time */4], 0, checkbox[/* animationTime */5], 1, 0.9);
-          var scaledSize = 28 / 2 * scale;
-          translate$4(x + scaledSize, y + scaledSize, env);
-          scale$9(scale, scale, env);
-          translate$4(-scaledSize, -scaledSize, env);
-          image(checkbox[/* checkedImage */0], /* tuple */[
-                0,
-                0
-              ], /* Some */[28], /* Some */[28], env);
-          popMatrix(env);
-          opacity(1, env);
-          if (checkbox[/* time */4] >= checkbox[/* animationTime */5]) {
-            return /* record */[
-                    /* checkedImage */checkbox[/* checkedImage */0],
-                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
-                    /* animationState : Nothing */2,
-                    /* checked */checkbox[/* checked */3],
-                    /* time */0,
-                    /* animationTime */checkbox[/* animationTime */5],
-                    /* prevPressDown */pressDown
-                  ];
-          } else {
-            return /* record */[
-                    /* checkedImage */checkbox[/* checkedImage */0],
-                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
-                    /* animationState */checkbox[/* animationState */2],
-                    /* checked */checkbox[/* checked */3],
-                    /* time */caml_float_min(checkbox[/* time */4] + deltaTime(env), checkbox[/* animationTime */5]),
-                    /* animationTime */checkbox[/* animationTime */5],
-                    /* prevPressDown */pressDown
-                  ];
-          }
-      case 2 : 
-          image(checkbox[/* uncheckedImage */1], pos, /* Some */[28], /* Some */[28], env);
-          opacity(remapf(checkbox[/* time */4], 0, checkbox[/* animationTime */5], 0, 1), env);
-          pushMatrix(env);
-          var scale$1 = remapf(checkbox[/* time */4], 0, checkbox[/* animationTime */5], 0.8, 1);
-          var scaledSize$1 = 28 / 2 * scale$1;
-          translate$4(x + scaledSize$1, y + scaledSize$1, env);
-          scale$9(scale$1, scale$1, env);
-          translate$4(-scaledSize$1, -scaledSize$1, env);
-          image(checkbox[/* checkedImage */0], /* tuple */[
-                0,
-                0
-              ], /* Some */[28], /* Some */[28], env);
-          popMatrix(env);
-          opacity(1, env);
-          if (checkbox[/* time */4] >= checkbox[/* animationTime */5]) {
-            return /* record */[
-                    /* checkedImage */checkbox[/* checkedImage */0],
-                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
-                    /* animationState : Nothing */2,
-                    /* checked */checkbox[/* checked */3],
-                    /* time */0,
-                    /* animationTime */checkbox[/* animationTime */5],
-                    /* prevPressDown */pressDown
-                  ];
-          } else {
-            return /* record */[
-                    /* checkedImage */checkbox[/* checkedImage */0],
-                    /* uncheckedImage */checkbox[/* uncheckedImage */1],
-                    /* animationState */checkbox[/* animationState */2],
-                    /* checked */checkbox[/* checked */3],
-                    /* time */caml_float_min(checkbox[/* time */4] + deltaTime(env), checkbox[/* animationTime */5]),
-                    /* animationTime */checkbox[/* animationTime */5],
-                    /* prevPressDown */pressDown
-                  ];
-          }
-      
     }
   }
 
@@ -12604,50 +12622,30 @@ var MyBundle = (function (exports) {
     var data = generateSine(15.1, /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[20], /* () */0);
     var maxAmplitude = getMaxAmplitude(data);
     var match = state[/* hamming */1][/* animationState */2];
-    switch (match) {
-      case 0 : 
-          hammingWindow(data, /* Some */[remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 1, 0)], /* () */0);
-          break;
-      case 1 : 
-          hammingWindow(data, /* Some */[remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 0, 1)], /* () */0);
-          break;
-      case 2 : 
-          if (state[/* hamming */1][/* checked */3]) {
-            hammingWindow(data, /* None */0, /* () */0);
-          }
-          break;
+    if (match >= 2) {
+      if (state[/* hamming */1][/* checked */3]) {
+        hammingWindow(data, /* None */0, /* () */0);
+      }
       
+    } else {
+      hammingWindow(data, /* Some */[remapf(state[/* hamming */1][/* time */4], 0, state[/* hamming */1][/* animationTime */5], 0, 1)], /* () */0);
     }
     var match$1 = state[/* hann */2][/* animationState */2];
-    switch (match$1) {
-      case 0 : 
-          hannWindow(data, /* Some */[remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 1, 0)], /* () */0);
-          break;
-      case 1 : 
-          hannWindow(data, /* Some */[remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 0, 1)], /* () */0);
-          break;
-      case 2 : 
-          if (state[/* hann */2][/* checked */3]) {
-            hannWindow(data, /* None */0, /* () */0);
-          }
-          break;
+    if (match$1 >= 2) {
+      if (state[/* hann */2][/* checked */3]) {
+        hannWindow(data, /* None */0, /* () */0);
+      }
       
+    } else {
+      hannWindow(data, /* Some */[remapf(state[/* hann */2][/* time */4], 0, state[/* hann */2][/* animationTime */5], 0, 1)], /* () */0);
     }
     var spectrum = fft(data, maxAmplitude, /* () */0);
-    text(/* None */0, "Hamming window", /* tuple */[
-          738,
+    var hamming = drawCheckbox(state[/* hamming */1], /* Some */["Hamming Window"], /* tuple */[
+          600,
           100
         ], env);
-    var hamming = drawCheckbox(state[/* hamming */1], /* tuple */[
-          700,
-          100
-        ], env);
-    text(/* None */0, "Hann window", /* tuple */[
-          738,
-          160
-        ], env);
-    var hann = drawCheckbox(state[/* hann */2], /* tuple */[
-          700,
+    var hann = drawCheckbox(state[/* hann */2], /* Some */["Hann window"], /* tuple */[
+          600,
           160
         ], env);
     var match$2 = mouse(env);
@@ -12721,11 +12719,11 @@ var MyBundle = (function (exports) {
 
   var samplingRate = 8192;
 
-  var hammingX = 700;
+  var hammingX = 600;
 
   var hammingY = 100;
 
-  var hannX = 700;
+  var hannX = 600;
 
   var hannY = 160;
   /* pi Not a pure module */
