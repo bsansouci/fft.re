@@ -18,8 +18,8 @@ let setup = env => {
   {time: 0., hamming: UI.makeCheckbox(env), hann: UI.makeCheckbox(env)};
 };
 
-let (hammingX, hammingY) = (700, 100);
-let (hannX, hannY) = (700, 160);
+let (hammingX, hammingY) = (600, 100);
+let (hannX, hannY) = (600, 160);
 
 let prevDeltaTime = ref(0.);
 let draw = (state, env) => {
@@ -83,14 +83,12 @@ let draw = (state, env) => {
 
   /* Hamming option */
   let hamming = {
-    Draw.text(~body="Hamming window", ~pos=(738, 100), env);
-    UI.drawCheckbox(~checkbox=state.hamming, ~pos=(hammingX, hammingY), env);
+    UI.drawCheckbox(~checkbox=state.hamming, ~text="Hamming Window", ~pos=(hammingX, hammingY), env);
   };
 
   /* Hann option */
   let hann = {
-    Draw.text(~body="Hann window", ~pos=(738, 160), env);
-    UI.drawCheckbox(~checkbox=state.hann, ~pos=(hannX, hannY), env);
+    UI.drawCheckbox(~checkbox=state.hann, ~text="Hann window", ~pos=(hannX, hannY), env);
   };
   let (mx, _) = Env.mouse(env);
 
