@@ -14,5 +14,6 @@
   }, {
     "backend": ["native", "js"],
     "main-module": "Index"
-  }]
+  }],
+  "refmt": 3
 }
