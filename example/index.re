@@ -41,19 +41,7 @@ let draw = (state, env) => {
   let maxAmplitude = Fft.getMaxAmplitude(data);
 
   switch (state.hamming.animationState) {
-  | CheckedToUnchecked =>
-    Fft.hammingWindow(
-      ~data,
-      ~amount=
-        Utils.remapf(
-          ~value=state.hamming.time,
-          ~low1=0.,
-          ~high1=state.hamming.animationTime,
-          ~low2=1.,
-          ~high2=0.,
-        ),
-      (),
-    )
+  | CheckedToUnchecked
   | UncheckedToChecked =>
     Fft.hammingWindow(
       ~data,
@@ -72,19 +60,8 @@ let draw = (state, env) => {
   };
 
   switch (state.hann.animationState) {
-  | CheckedToUnchecked =>
-    Fft.hannWindow(
-      ~data,
-      ~amount=
-        Utils.remapf(
-          ~value=state.hann.time,
-          ~low1=0.,
-          ~high1=state.hann.animationTime,
-          ~low2=1.,
-          ~high2=0.,
-        ),
-      (),
-    )
+  | CheckedToUnchecked
+
   | UncheckedToChecked =>
     Fft.hannWindow(
       ~data,
