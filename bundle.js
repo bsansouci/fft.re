@@ -4129,17 +4129,15 @@ var MyBundle = (function (exports) {
 
   function getTouch0(e, canvas) {
     var touches = Array.prototype.slice.call(e.changedTouches);
-    var match = touches.filter((function (t) {
-            return t.identifier === 0;
-          }));
-    if (match.length !== 1) {
+    if (touches.length !== 1) {
       return /* None */0;
     } else {
-      var t = match[0];
+      var t = touches[0];
       var rect = canvas.getBoundingClientRect();
       var x = t.clientX - rect.left | 0;
       var y = t.clientY - rect.top | 0;
       return /* Some */[/* tuple */[
+                t.identifier,
                 x,
                 y
               ]];
@@ -4265,14 +4263,16 @@ var MyBundle = (function (exports) {
 
   function render(param, mouseDown, mouseUp, mouseMove, keyDown, keyUp, windowResize, displayFunc, _) {
     var canvas = param[0];
+    var prevTouchId = [0];
     if (mouseDown) {
       var cb = mouseDown[0];
       canvas.addEventListener("touchstart", (function (e) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
+                prevTouchId[0] = match$1[0];
                 e.preventDefault();
-                return _4(cb, /* LeftButton */0, /* MouseDown */0, match$1[0], match$1[1]);
+                return _4(cb, /* LeftButton */0, /* MouseDown */0, match$1[1], match$1[2]);
               } else {
                 return /* () */0;
               }
@@ -4285,7 +4285,7 @@ var MyBundle = (function (exports) {
                       assert_failure,
                       [
                         "reasongl_web.re",
-                        321,
+                        323,
                         19
                       ]
                     ];
@@ -4304,8 +4304,12 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                e.preventDefault();
-                return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[0], match$1[1]);
+                if (prevTouchId[0] === match$1[0]) {
+                  e.preventDefault();
+                  return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[1], match$1[2]);
+                } else {
+                  return 0;
+                }
               } else {
                 return /* () */0;
               }
@@ -4314,8 +4318,12 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                e.preventDefault();
-                return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[0], match$1[1]);
+                if (prevTouchId[0] === match$1[0]) {
+                  e.preventDefault();
+                  return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[1], match$1[2]);
+                } else {
+                  return 0;
+                }
               } else {
                 return /* () */0;
               }
@@ -4328,7 +4336,7 @@ var MyBundle = (function (exports) {
                       assert_failure,
                       [
                         "reasongl_web.re",
-                        359,
+                        365,
                         19
                       ]
                     ];
@@ -4347,8 +4355,12 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                e.preventDefault();
-                return _2(cb$2, match$1[0], match$1[1]);
+                if (prevTouchId[0] === match$1[0]) {
+                  e.preventDefault();
+                  return _2(cb$2, match$1[1], match$1[2]);
+                } else {
+                  return 0;
+                }
               } else {
                 return /* () */0;
               }
@@ -4463,7 +4475,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  652,
+                  660,
                   17
                 ]
               ];
@@ -4494,7 +4506,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  667,
+                  675,
                   17
                 ]
               ];
