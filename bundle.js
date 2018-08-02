@@ -4263,14 +4263,14 @@ var MyBundle = (function (exports) {
 
   function render(param, mouseDown, mouseUp, mouseMove, keyDown, keyUp, windowResize, displayFunc, _) {
     var canvas = param[0];
-    var prevTouchId = [0];
+    var prevTouchId = [/* None */0];
     if (mouseDown) {
       var cb = mouseDown[0];
       canvas.addEventListener("touchstart", (function (e) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                prevTouchId[0] = match$1[0];
+                prevTouchId[0] = /* Some */[match$1[0]];
                 e.preventDefault();
                 return _4(cb, /* LeftButton */0, /* MouseDown */0, match$1[1], match$1[2]);
               } else {
@@ -4304,11 +4304,13 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                if (prevTouchId[0] === match$1[0]) {
+                var match$2 = prevTouchId[0];
+                if (match$2 && match$2[0] === match$1[0]) {
+                  prevTouchId[0] = /* None */0;
                   e.preventDefault();
                   return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[1], match$1[2]);
                 } else {
-                  return 0;
+                  return /* () */0;
                 }
               } else {
                 return /* () */0;
@@ -4318,11 +4320,13 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                if (prevTouchId[0] === match$1[0]) {
+                var match$2 = prevTouchId[0];
+                if (match$2 && match$2[0] === match$1[0]) {
+                  prevTouchId[0] = /* None */0;
                   e.preventDefault();
                   return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[1], match$1[2]);
                 } else {
-                  return 0;
+                  return /* () */0;
                 }
               } else {
                 return /* () */0;
@@ -4336,7 +4340,7 @@ var MyBundle = (function (exports) {
                       assert_failure,
                       [
                         "reasongl_web.re",
-                        365,
+                        371,
                         19
                       ]
                     ];
@@ -4355,11 +4359,12 @@ var MyBundle = (function (exports) {
               var match = getTouch0(e, canvas);
               if (match) {
                 var match$1 = match[0];
-                if (prevTouchId[0] === match$1[0]) {
+                var match$2 = prevTouchId[0];
+                if (match$2 && match$2[0] === match$1[0]) {
                   e.preventDefault();
                   return _2(cb$2, match$1[1], match$1[2]);
                 } else {
-                  return 0;
+                  return /* () */0;
                 }
               } else {
                 return /* () */0;
@@ -4475,7 +4480,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  660,
+                  668,
                   17
                 ]
               ];
@@ -4506,7 +4511,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  675,
+                  683,
                   17
                 ]
               ];
