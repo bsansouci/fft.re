@@ -4127,6 +4127,25 @@ var MyBundle = (function (exports) {
 
   var $$window = (window);
 
+  function getTouch0(e, canvas) {
+    var touches = Array.prototype.slice.call(e.changedTouches);
+    var match = touches.filter((function (t) {
+            return t.identifier === 0;
+          }));
+    if (match.length !== 1) {
+      return /* None */0;
+    } else {
+      var t = match[0];
+      var rect = canvas.getBoundingClientRect();
+      var x = t.clientX - rect.left | 0;
+      var y = t.clientY - rect.top | 0;
+      return /* Some */[/* tuple */[
+                x,
+                y
+              ]];
+    }
+  }
+
   var makeAudioContext = ( function() { return new (window.AudioContext || window.webkitAudioContext)(); } );
 
   function readFile(filename, cb) {
@@ -4248,6 +4267,16 @@ var MyBundle = (function (exports) {
     var canvas = param[0];
     if (mouseDown) {
       var cb = mouseDown[0];
+      canvas.addEventListener("touchstart", (function (e) {
+              var match = getTouch0(e, canvas);
+              if (match) {
+                var match$1 = match[0];
+                e.preventDefault();
+                return _4(cb, /* LeftButton */0, /* MouseDown */0, match$1[0], match$1[1]);
+              } else {
+                return /* () */0;
+              }
+            }));
       canvas.addEventListener("mousedown", (function (e) {
               var match = e.button;
               var button;
@@ -4256,7 +4285,7 @@ var MyBundle = (function (exports) {
                       assert_failure,
                       [
                         "reasongl_web.re",
-                        292,
+                        321,
                         19
                       ]
                     ];
@@ -4271,6 +4300,26 @@ var MyBundle = (function (exports) {
     }
     if (mouseUp) {
       var cb$1 = mouseUp[0];
+      canvas.addEventListener("touchend", (function (e) {
+              var match = getTouch0(e, canvas);
+              if (match) {
+                var match$1 = match[0];
+                e.preventDefault();
+                return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[0], match$1[1]);
+              } else {
+                return /* () */0;
+              }
+            }));
+      canvas.addEventListener("touchcancel", (function (e) {
+              var match = getTouch0(e, canvas);
+              if (match) {
+                var match$1 = match[0];
+                e.preventDefault();
+                return _4(cb$1, /* LeftButton */0, /* MouseUp */1, match$1[0], match$1[1]);
+              } else {
+                return /* () */0;
+              }
+            }));
       canvas.addEventListener("mouseup", (function (e) {
               var match = e.button;
               var button;
@@ -4279,7 +4328,7 @@ var MyBundle = (function (exports) {
                       assert_failure,
                       [
                         "reasongl_web.re",
-                        314,
+                        359,
                         19
                       ]
                     ];
@@ -4294,6 +4343,16 @@ var MyBundle = (function (exports) {
     }
     if (mouseMove) {
       var cb$2 = mouseMove[0];
+      canvas.addEventListener("touchmove", (function (e) {
+              var match = getTouch0(e, canvas);
+              if (match) {
+                var match$1 = match[0];
+                e.preventDefault();
+                return _2(cb$2, match$1[0], match$1[1]);
+              } else {
+                return /* () */0;
+              }
+            }));
       canvas.addEventListener("mousemove", (function (e) {
               var rect = canvas.getBoundingClientRect();
               var x = e.clientX - rect.left | 0;
@@ -4404,7 +4463,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  603,
+                  652,
                   17
                 ]
               ];
@@ -4435,7 +4494,7 @@ var MyBundle = (function (exports) {
                 assert_failure,
                 [
                   "reasongl_web.re",
-                  616,
+                  667,
                   17
                 ]
               ];
