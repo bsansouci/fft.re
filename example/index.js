@@ -19,7 +19,9 @@ function setup(env) {
   return /* record */[
           /* time */0,
           /* hamming */UI.makeCheckbox(/* None */0, env),
-          /* hann */UI.makeCheckbox(/* None */0, env)
+          /* hann */UI.makeCheckbox(/* None */0, env),
+          /* frequency */UI.makeSlider(/* None */0, /* None */0, /* Some */[500], env),
+          /* numberOfSines */UI.makeSlider(/* Some */[20], /* Some */[1], /* Some */[50], env)
         ];
 }
 
@@ -28,8 +30,52 @@ var prevDeltaTime = [0];
 function draw(state, env) {
   Reprocessing_Draw.background(Reprocessing_Utils.color(199, 217, 229, 255), env);
   var dt = Reprocessing_Env.deltaTime(env);
-  var offset = state[/* time */0] / 10;
-  var data = Fft.generateSine(15.1, /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[20], /* () */0);
+  var offset = state[/* time */0];
+  var frequency = UI.drawSlider(state[/* frequency */3], /* tuple */[
+        600,
+        80
+      ], env);
+  Reprocessing_Draw.text(/* None */0, Curry._1(Printf.sprintf(/* Format */[
+                /* String_literal */Block.__(11, [
+                    "Square wave: ",
+                    /* Float */Block.__(8, [
+                        /* Float_f */0,
+                        /* Lit_padding */Block.__(0, [
+                            /* Right */1,
+                            0
+                          ]),
+                        /* Lit_precision */[2],
+                        /* String_literal */Block.__(11, [
+                            "Hz",
+                            /* End_of_format */0
+                          ])
+                      ])
+                  ]),
+                "Square wave: %0.2fHz"
+              ]), frequency[/* value */0]), /* tuple */[
+        600,
+        20
+      ], env);
+  var numberOfSines = UI.drawSlider(state[/* numberOfSines */4], /* tuple */[
+        600,
+        160
+      ], env);
+  Reprocessing_Draw.text(/* None */0, Curry._1(Printf.sprintf(/* Format */[
+                /* String_literal */Block.__(11, [
+                    "Number of sines: ",
+                    /* Int */Block.__(4, [
+                        /* Int_d */0,
+                        /* No_padding */0,
+                        /* No_precision */0,
+                        /* End_of_format */0
+                      ])
+                  ]),
+                "Number of sines: %d"
+              ]), numberOfSines[/* value */0] | 0), /* tuple */[
+        600,
+        100
+      ], env);
+  var data = Fft.generateSine(frequency[/* value */0], /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[numberOfSines[/* value */0] | 0], /* () */0);
   var maxAmplitude = Fft.getMaxAmplitude(data);
   var match = state[/* hamming */1][/* animationState */2];
   if (match >= 2) {
@@ -52,14 +98,14 @@ function draw(state, env) {
   var spectrum = Fft.fft(data, maxAmplitude, /* () */0);
   var hamming = UI.drawCheckbox(state[/* hamming */1], /* Some */["Hamming Window"], /* tuple */[
         600,
-        100
+        300
       ], env);
   var hann = UI.drawCheckbox(state[/* hann */2], /* Some */["Hann window"], /* tuple */[
         600,
-        160
+        360
       ], env);
   var match$2 = Reprocessing_Env.mouse(env);
-  var j = (match$2[0] - 10) / 5 | 0;
+  var j = (match$2[0] - 1) / 2 | 0;
   if (j >= 0 && j < 8192) {
     Reprocessing_Draw.text(/* None */0, Curry._2(Printf.sprintf(/* Format */[
                   /* Int */Block.__(4, [
@@ -87,13 +133,13 @@ function draw(state, env) {
   for(var i = 1 ,i_finish = Caml_int32.div(8192, timeWindowSeconds | 0) - 1 | 0; i <= i_finish; ++i){
     Reprocessing_Draw.stroke(Reprocessing_Utils.color(0, 0, 0, 255), env);
     var f = i;
-    var prev_000 = 10 + (i - 1 | 0) * 2;
+    var prev_000 = 1 + (i - 1 | 0) * 2;
     var prev_001 = 150 + data[(f - 1) * timeWindowSeconds | 0][/* re */0] * 100;
     var prev = /* tuple */[
       prev_000,
       prev_001
     ];
-    var cur_000 = 10 + i * 2;
+    var cur_000 = 1 + i * 2;
     var cur_001 = 150 + data[f * timeWindowSeconds | 0][/* re */0] * 100;
     var cur = /* tuple */[
       cur_000,
@@ -110,14 +156,16 @@ function draw(state, env) {
       Reprocessing_Draw.fill(Reprocessing_Utils.color(255 - (spectrum[i$1] * 255 | 0) | 0, spectrum[i$1] * 255 | 0, 0, 255), env);
     }
     Reprocessing_Draw.rectf(/* tuple */[
-          10 + i$1 * 5,
+          1 + i$1 * 2,
           600 - height
-        ], 5 - 1, height, env);
+        ], 2, height, env);
   }
   return /* record */[
           /* time */state[/* time */0] + dt,
           /* hamming */hamming,
-          /* hann */hann
+          /* hann */hann,
+          /* frequency */frequency,
+          /* numberOfSines */numberOfSines
         ];
 }
 
@@ -131,11 +179,11 @@ var samplingRate = 8192;
 
 var hammingX = 600;
 
-var hammingY = 100;
+var hammingY = 300;
 
 var hannX = 600;
 
-var hannY = 160;
+var hannY = 360;
 
 export {
   pi ,

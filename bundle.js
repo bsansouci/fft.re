@@ -1,57 +1,6 @@
 var MyBundle = (function (exports) {
   'use strict';
 
-  function caml_int_compare(x, y) {
-    if (x < y) {
-      return -1;
-    } else if (x === y) {
-      return 0;
-    } else {
-      return 1;
-    }
-  }
-
-  function caml_string_compare(s1, s2) {
-    if (s1 === s2) {
-      return 0;
-    } else if (s1 < s2) {
-      return -1;
-    } else {
-      return 1;
-    }
-  }
-
-  function caml_float_min(x, y) {
-    if (x < y) {
-      return x;
-    } else {
-      return y;
-    }
-  }
-
-  function caml_int_max(x, y) {
-    if (x > y) {
-      return x;
-    } else {
-      return y;
-    }
-  }
-
-  function caml_float_max(x, y) {
-    if (x > y) {
-      return x;
-    } else {
-      return y;
-    }
-  }
-  /* No side effect */
-
-  function __(tag, block) {
-    block.tag = tag;
-    return block;
-  }
-  /* No side effect */
-
   var out_of_memory = /* tuple */[
     "Out_of_memory",
     0
@@ -136,6 +85,79 @@ var MyBundle = (function (exports) {
 
   undefined_recursive_module.tag = 248;
   /*  Not a pure module */
+
+  function div(x, y) {
+    if (y === 0) {
+      throw division_by_zero;
+    } else {
+      return x / y | 0;
+    }
+  }
+
+  var imul = ( Math.imul || function (x,y) {
+    y |= 0; return ((((x >> 16) * y) << 16) + (x & 0xffff) * y)|0; 
+  }
+  );
+  /* imul Not a pure module */
+
+  function caml_int_compare(x, y) {
+    if (x < y) {
+      return -1;
+    } else if (x === y) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  function caml_string_compare(s1, s2) {
+    if (s1 === s2) {
+      return 0;
+    } else if (s1 < s2) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+
+  function caml_int_min(x, y) {
+    if (x < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  function caml_float_min(x, y) {
+    if (x < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  function caml_int_max(x, y) {
+    if (x > y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  function caml_float_max(x, y) {
+    if (x > y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+  /* No side effect */
+
+  function __(tag, block) {
+    block.tag = tag;
+    return block;
+  }
+  /* No side effect */
 
   function caml_array_sub(x, offset, len) {
     var result = new Array(len);
@@ -941,20 +963,6 @@ var MyBundle = (function (exports) {
     }
   }
   /* No side effect */
-
-  function div(x, y) {
-    if (y === 0) {
-      throw division_by_zero;
-    } else {
-      return x / y | 0;
-    }
-  }
-
-  var imul = ( Math.imul || function (x,y) {
-    y |= 0; return ((((x >> 16) * y) << 16) + (x & 0xffff) * y)|0; 
-  }
-  );
-  /* imul Not a pure module */
 
   var repeat = ( (String.prototype.repeat && function (count,self){return self.repeat(count)}) ||
                                                     function(count , self) {
@@ -6557,6 +6565,124 @@ var MyBundle = (function (exports) {
     return drawArc(env, center, radx, rady, 0, tau, false, matrix, c);
   }
 
+  function drawArcStroke(env, param, radx, rady, start, stop, isOpen, isPie, matrix, strokeColor, strokeWidth) {
+    var a = strokeColor[/* a */3];
+    var b = strokeColor[/* b */2];
+    var g = strokeColor[/* g */1];
+    var r = strokeColor[/* r */0];
+    var yCenterOfCircle = param[1];
+    var xCenterOfCircle = param[0];
+    var verticesData = env[/* batch */10][/* vertexArray */0];
+    var elementData = env[/* batch */10][/* elementArray */1];
+    var noOfFans = ((radx + rady | 0) / 2 | 0) + 10 | 0;
+    var set = Gl[/* Bigarray */28][/* set */7];
+    maybeFlushBatch(/* None */0, imul(noOfFans, 6), imul((noOfFans << 1), vertexSize), env);
+    var match = stop < start;
+    var match$1 = match ? /* tuple */[
+        stop,
+        start
+      ] : /* tuple */[
+        start,
+        stop
+      ];
+    var stop$1 = match$1[1];
+    var start$1 = match$1[0];
+    var pi$$1 = 4.0 * Math.atan(1.0);
+    var anglePerFan = 2 * pi$$1 / noOfFans;
+    var start_i = (start$1 / anglePerFan | 0) - 2 | 0;
+    var stop_i = stop$1 / anglePerFan | 0;
+    var prevEl = /* None */0;
+    var strokeWidth$1 = strokeWidth;
+    var halfStrokeWidth = strokeWidth$1 / 2;
+    for(var i = start_i; i <= stop_i; ++i){
+      var angle = caml_float_max(start$1, caml_float_min(anglePerFan * (i + 1 | 0), stop$1));
+      var param_000 = xCenterOfCircle + Math.cos(angle) * (radx - halfStrokeWidth);
+      var param_001 = yCenterOfCircle + Math.sin(angle) * (rady - halfStrokeWidth);
+      var param$1 = /* tuple */[
+        param_000,
+        param_001
+      ];
+      var match$2 = matptmul(matrix, param$1);
+      var param_000$1 = xCenterOfCircle + Math.cos(angle) * (radx + halfStrokeWidth);
+      var param_001$1 = yCenterOfCircle + Math.sin(angle) * (rady + halfStrokeWidth);
+      var param$2 = /* tuple */[
+        param_000$1,
+        param_001$1
+      ];
+      var match$3 = matptmul(matrix, param$2);
+      var ii = env[/* batch */10][/* vertexPtr */2];
+      _3(set, verticesData, ii + 0 | 0, match$2[0]);
+      _3(set, verticesData, ii + 1 | 0, match$2[1]);
+      _3(set, verticesData, ii + 2 | 0, r);
+      _3(set, verticesData, ii + 3 | 0, g);
+      _3(set, verticesData, ii + 4 | 0, b);
+      _3(set, verticesData, ii + 5 | 0, a);
+      _3(set, verticesData, ii + 6 | 0, 0.0);
+      _3(set, verticesData, ii + 7 | 0, 0.0);
+      var ii$1 = ii + vertexSize | 0;
+      _3(set, verticesData, ii$1 + 0 | 0, match$3[0]);
+      _3(set, verticesData, ii$1 + 1 | 0, match$3[1]);
+      _3(set, verticesData, ii$1 + 2 | 0, r);
+      _3(set, verticesData, ii$1 + 3 | 0, g);
+      _3(set, verticesData, ii$1 + 4 | 0, b);
+      _3(set, verticesData, ii$1 + 5 | 0, a);
+      _3(set, verticesData, ii$1 + 6 | 0, 0.0);
+      _3(set, verticesData, ii$1 + 7 | 0, 0.0);
+      env[/* batch */10][/* vertexPtr */2] = env[/* batch */10][/* vertexPtr */2] + (vertexSize << 1) | 0;
+      var currOuter = div(ii$1, vertexSize);
+      var currInner = div(ii$1, vertexSize) - 1 | 0;
+      var currEl = /* Some */[/* tuple */[
+          currInner,
+          currOuter
+        ]];
+      var match$4 = prevEl;
+      if (match$4) {
+        var match$5 = match$4[0];
+        var prevInner = match$5[0];
+        var elementArrayOffset = env[/* batch */10][/* elementPtr */3];
+        _3(set, elementData, elementArrayOffset, prevInner);
+        _3(set, elementData, elementArrayOffset + 1 | 0, match$5[1]);
+        _3(set, elementData, elementArrayOffset + 2 | 0, currOuter);
+        _3(set, elementData, elementArrayOffset + 3 | 0, currOuter);
+        _3(set, elementData, elementArrayOffset + 4 | 0, prevInner);
+        _3(set, elementData, elementArrayOffset + 5 | 0, currInner);
+        env[/* batch */10][/* elementPtr */3] = env[/* batch */10][/* elementPtr */3] + 6 | 0;
+        prevEl = currEl;
+      } else {
+        prevEl = currEl;
+      }
+    }
+    if (isOpen) {
+      return 0;
+    } else {
+      var startPt_000 = xCenterOfCircle + Math.cos(start$1) * radx;
+      var startPt_001 = yCenterOfCircle + Math.sin(start$1) * rady;
+      var startPt = /* tuple */[
+        startPt_000,
+        startPt_001
+      ];
+      var stopPt_000 = xCenterOfCircle + Math.cos(stop$1) * radx;
+      var stopPt_001 = yCenterOfCircle + Math.sin(stop$1) * rady;
+      var stopPt = /* tuple */[
+        stopPt_000,
+        stopPt_001
+      ];
+      var centerOfCircle = /* tuple */[
+        xCenterOfCircle,
+        yCenterOfCircle
+      ];
+      if (isPie) {
+        drawLineWithMatrix(startPt, centerOfCircle, matrix, strokeColor, strokeWidth$1, false, env);
+        drawLineWithMatrix(stopPt, centerOfCircle, matrix, strokeColor, strokeWidth$1, false, env);
+        drawEllipse(env, centerOfCircle, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
+      } else {
+        drawLineWithMatrix(startPt, stopPt, matrix, strokeColor, strokeWidth$1, false, env);
+      }
+      drawEllipse(env, startPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
+      return drawEllipse(env, stopPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
+    }
+  }
+
   function loadImage$1(env, filename, isPixel) {
     var imageRef = /* record */[
       /* glData : None */0,
@@ -7997,6 +8123,36 @@ var MyBundle = (function (exports) {
     }
   }
 
+  function line(param, param$1, env) {
+    return linef(/* tuple */[
+                param[0],
+                param[1]
+              ], /* tuple */[
+                param$1[0],
+                param$1[1]
+              ], env);
+  }
+
+  function ellipsef(center, radx, rady, env) {
+    var match = env[/* style */13][/* fillColor */3];
+    if (match) {
+      drawEllipse(env, center, radx, rady, env[/* matrix */16], match[0]);
+    }
+    var match$1 = env[/* style */13][/* strokeColor */0];
+    if (match$1) {
+      return drawArcStroke(env, center, radx, rady, 0, tau, true, false, env[/* matrix */16], match$1[0], env[/* style */13][/* strokeWeight */1]);
+    } else {
+      return /* () */0;
+    }
+  }
+
+  function ellipse(param, radx, rady, env) {
+    return ellipsef(/* tuple */[
+                param[0],
+                param[1]
+              ], radx, rady, env);
+  }
+
   function quadf(p1, p2, p3, p4, env) {
     var partial_arg = env[/* matrix */16];
     var transform = function (param) {
@@ -8834,6 +8990,88 @@ var MyBundle = (function (exports) {
             /* time */0,
             /* animationTime */0.2,
             /* prevPressDown */false
+          ];
+  }
+
+  function makeSlider($staropt$star, $staropt$star$1, $staropt$star$2, _) {
+    var defaultValue = $staropt$star ? $staropt$star[0] : 50;
+    var min = $staropt$star$1 ? $staropt$star$1[0] : 0;
+    var max = $staropt$star$2 ? $staropt$star$2[0] : 100;
+    return /* record */[
+            /* value */defaultValue,
+            /* min */min,
+            /* max */max,
+            /* selected */false,
+            /* deltaXFromCenter */0,
+            /* prevPressDown */false
+          ];
+  }
+
+  function drawSlider(slider, pos, env) {
+    var y = pos[1];
+    var x = pos[0];
+    var lengthf = 300;
+    var knobSizef = 8;
+    var endOfLine = x + ((slider[/* value */0] - slider[/* min */1]) / slider[/* max */2] * lengthf | 0) | 0;
+    var match = mouse(env);
+    var my = match[1];
+    var mx = match[0];
+    var pressDown = mousePressed(env);
+    var match$1;
+    if (pressDown && !slider[/* selected */3]) {
+      var deltaX = mx - endOfLine | 0;
+      var deltaY = my - y | 0;
+      var len = Math.sqrt(imul(deltaX, deltaX) + imul(deltaY, deltaY) | 0);
+      match$1 = /* tuple */[
+        len < knobSizef,
+        deltaX
+      ];
+    } else {
+      match$1 = pressDown && slider[/* selected */3] ? /* tuple */[
+          true,
+          slider[/* deltaXFromCenter */4]
+        ] : /* tuple */[
+          false,
+          slider[/* deltaXFromCenter */4]
+        ];
+    }
+    var deltaXFromCenter = match$1[1];
+    var selected = match$1[0];
+    var withinSliderBounds = mx > x && mx < (x + 300 | 0) && my > ((y - 2 | 0) - 6 | 0) && my < ((y + 2 | 0) + 6 | 0);
+    var endOfLine$1 = selected ? mx - deltaXFromCenter | 0 : (
+        !pressDown && slider[/* prevPressDown */5] && withinSliderBounds ? mx : endOfLine
+      );
+    var endOfLine$2 = caml_int_max(caml_int_min(endOfLine$1, x + 300 | 0), x);
+    strokeWeight(4, env);
+    strokeCap(/* Round */0, env);
+    stroke(color(177, 177, 177, 255), env);
+    line(pos, /* tuple */[
+          x + 300 | 0,
+          y
+        ], env);
+    stroke(color(96, 153, 238, 255), env);
+    line(pos, /* tuple */[
+          endOfLine$2,
+          y
+        ], env);
+    strokeWeight(1, env);
+    stroke(color(177, 177, 177, 255), env);
+    if (selected) {
+      fill$3(color(230, 230, 230, 255), env);
+    } else {
+      fill$3(color(255, 255, 255, 255), env);
+    }
+    ellipse(/* tuple */[
+          endOfLine$2,
+          y
+        ], 8, 8, env);
+    return /* record */[
+            /* value */(endOfLine$2 - x | 0) * slider[/* max */2] / lengthf + slider[/* min */1],
+            /* min */slider[/* min */1],
+            /* max */slider[/* max */2],
+            /* selected */selected,
+            /* deltaXFromCenter */deltaXFromCenter,
+            /* prevPressDown */pressDown
           ];
   }
   /* Reprocessing_Env Not a pure module */
@@ -12609,7 +12847,9 @@ var MyBundle = (function (exports) {
     return /* record */[
             /* time */0,
             /* hamming */makeCheckbox(/* None */0, env),
-            /* hann */makeCheckbox(/* None */0, env)
+            /* hann */makeCheckbox(/* None */0, env),
+            /* frequency */makeSlider(/* None */0, /* None */0, /* Some */[500], env),
+            /* numberOfSines */makeSlider(/* Some */[20], /* Some */[1], /* Some */[50], env)
           ];
   }
 
@@ -12618,8 +12858,52 @@ var MyBundle = (function (exports) {
   function draw(state, env) {
     background(color(199, 217, 229, 255), env);
     var dt = deltaTime(env);
-    var offset = state[/* time */0] / 10;
-    var data = generateSine(15.1, /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[20], /* () */0);
+    var offset = state[/* time */0];
+    var frequency = drawSlider(state[/* frequency */3], /* tuple */[
+          600,
+          80
+        ], env);
+    text(/* None */0, _1(sprintf(/* Format */[
+                  /* String_literal */__(11, [
+                      "Square wave: ",
+                      /* Float */__(8, [
+                          /* Float_f */0,
+                          /* Lit_padding */__(0, [
+                              /* Right */1,
+                              0
+                            ]),
+                          /* Lit_precision */[2],
+                          /* String_literal */__(11, [
+                              "Hz",
+                              /* End_of_format */0
+                            ])
+                        ])
+                    ]),
+                  "Square wave: %0.2fHz"
+                ]), frequency[/* value */0]), /* tuple */[
+          600,
+          20
+        ], env);
+    var numberOfSines = drawSlider(state[/* numberOfSines */4], /* tuple */[
+          600,
+          160
+        ], env);
+    text(/* None */0, _1(sprintf(/* Format */[
+                  /* String_literal */__(11, [
+                      "Number of sines: ",
+                      /* Int */__(4, [
+                          /* Int_d */0,
+                          /* No_padding */0,
+                          /* No_precision */0,
+                          /* End_of_format */0
+                        ])
+                    ]),
+                  "Number of sines: %d"
+                ]), numberOfSines[/* value */0] | 0), /* tuple */[
+          600,
+          100
+        ], env);
+    var data = generateSine(frequency[/* value */0], /* Some */[8192], /* Some */[8192], /* Some */[offset], /* Some */[numberOfSines[/* value */0] | 0], /* () */0);
     var maxAmplitude = getMaxAmplitude(data);
     var match = state[/* hamming */1][/* animationState */2];
     if (match >= 2) {
@@ -12642,14 +12926,14 @@ var MyBundle = (function (exports) {
     var spectrum = fft(data, maxAmplitude, /* () */0);
     var hamming = drawCheckbox(state[/* hamming */1], /* Some */["Hamming Window"], /* tuple */[
           600,
-          100
+          300
         ], env);
     var hann = drawCheckbox(state[/* hann */2], /* Some */["Hann window"], /* tuple */[
           600,
-          160
+          360
         ], env);
     var match$2 = mouse(env);
-    var j = (match$2[0] - 10) / 5 | 0;
+    var j = (match$2[0] - 1) / 2 | 0;
     if (j >= 0 && j < 8192) {
       text(/* None */0, _2(sprintf(/* Format */[
                     /* Int */__(4, [
@@ -12677,13 +12961,13 @@ var MyBundle = (function (exports) {
     for(var i = 1 ,i_finish = div(8192, timeWindowSeconds | 0) - 1 | 0; i <= i_finish; ++i){
       stroke(color(0, 0, 0, 255), env);
       var f = i;
-      var prev_000 = 10 + (i - 1 | 0) * 2;
+      var prev_000 = 1 + (i - 1 | 0) * 2;
       var prev_001 = 150 + data[(f - 1) * timeWindowSeconds | 0][/* re */0] * 100;
       var prev = /* tuple */[
         prev_000,
         prev_001
       ];
-      var cur_000 = 10 + i * 2;
+      var cur_000 = 1 + i * 2;
       var cur_001 = 150 + data[f * timeWindowSeconds | 0][/* re */0] * 100;
       var cur = /* tuple */[
         cur_000,
@@ -12700,14 +12984,16 @@ var MyBundle = (function (exports) {
         fill$3(color(255 - (spectrum[i$1] * 255 | 0) | 0, spectrum[i$1] * 255 | 0, 0, 255), env);
       }
       rectf(/* tuple */[
-            10 + i$1 * 5,
+            1 + i$1 * 2,
             600 - height$$1
-          ], 5 - 1, height$$1, env);
+          ], 2, height$$1, env);
     }
     return /* record */[
             /* time */state[/* time */0] + dt,
             /* hamming */hamming,
-            /* hann */hann
+            /* hann */hann,
+            /* frequency */frequency,
+            /* numberOfSines */numberOfSines
           ];
   }
 
@@ -12721,11 +13007,11 @@ var MyBundle = (function (exports) {
 
   var hammingX = 600;
 
-  var hammingY = 100;
+  var hammingY = 300;
 
   var hannX = 600;
 
-  var hannY = 160;
+  var hannY = 360;
   /* pi Not a pure module */
 
   exports.pi = pi$2;

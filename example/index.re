@@ -10,31 +10,57 @@ type state = {
   time: float,
   hamming: UI.checkboxT,
   hann: UI.checkboxT,
+  frequency: UI.sliderT,
+  numberOfSines: UI.sliderT,
 };
 
 let setup = env => {
   Env.size(~width=1000, ~height=600, env);
   Draw.strokeCap(Square, env);
-  {time: 0., hamming: UI.makeCheckbox(env), hann: UI.makeCheckbox(env)};
+  {
+    time: 0.,
+    hamming: UI.makeCheckbox(env),
+    hann: UI.makeCheckbox(env),
+    frequency: UI.makeSlider(~max=500., env),
+    numberOfSines: UI.makeSlider(~defaultValue=20., ~min=1., ~max=50., env),
+  };
 };
 
-let (hammingX, hammingY) = (600, 100);
-let (hannX, hannY) = (600, 160);
+let (hammingX, hammingY) = (600, 300);
+let (hannX, hannY) = (600, 360);
 
 let prevDeltaTime = ref(0.);
 let draw = (state, env) => {
   Draw.background(Utils.color(~r=199, ~g=217, ~b=229, ~a=255), env);
   let dt = Env.deltaTime(env);
 
-  let offset = state.time /. 10.;
+  let offset = state.time;
 
+  let frequency =
+    UI.drawSlider(~slider=state.frequency, ~pos=(600, 80), env);
+  Draw.text(
+    ~body=Printf.sprintf("Square wave: %0.2fHz", frequency.value),
+    ~pos=(600, 20),
+    env,
+  );
+  let numberOfSines =
+    UI.drawSlider(~slider=state.numberOfSines, ~pos=(600, 160), env);
+  Draw.text(
+    ~body=
+      Printf.sprintf(
+        "Number of sines: %d",
+        int_of_float(numberOfSines.value),
+      ),
+    ~pos=(600, 100),
+    env,
+  );
   let data =
     Fft.generateSine(
-      ~frequency,
+      ~frequency=frequency.value,
       ~samplingRate,
       ~offset,
       ~size=fftBinSize,
-      ~numberOfSines=20,
+      ~numberOfSines=int_of_float(numberOfSines.value),
       (),
     );
 
@@ -61,7 +87,6 @@ let draw = (state, env) => {
 
   switch (state.hann.animationState) {
   | CheckedToUnchecked
-
   | UncheckedToChecked =>
     Fft.hannWindow(
       ~data,
@@ -82,18 +107,26 @@ let draw = (state, env) => {
   let spectrum = Fft.fft(~data, ~maxAmplitude, ());
 
   /* Hamming option */
-  let hamming = {
-    UI.drawCheckbox(~checkbox=state.hamming, ~text="Hamming Window", ~pos=(hammingX, hammingY), env);
-  };
+  let hamming =
+    UI.drawCheckbox(
+      ~checkbox=state.hamming,
+      ~text="Hamming Window",
+      ~pos=(hammingX, hammingY),
+      env,
+    );
 
   /* Hann option */
-  let hann = {
-    UI.drawCheckbox(~checkbox=state.hann, ~text="Hann window", ~pos=(hannX, hannY), env);
-  };
+  let hann =
+    UI.drawCheckbox(
+      ~checkbox=state.hann,
+      ~text="Hann window",
+      ~pos=(hannX, hannY),
+      env,
+    );
   let (mx, _) = Env.mouse(env);
 
-  let padding = 10.;
-  let bucketSize = 5.;
+  let padding = 1.;
+  let bucketSize = 2.;
   let j = int_of_float((float_of_int(mx) -. padding) /. bucketSize);
   if (j >= 0 && j < fftBinSize) {
     Draw.text(
@@ -144,12 +177,12 @@ let draw = (state, env) => {
     };
     Draw.rectf(
       ~pos=(padding +. float_of_int(i) *. bucketSize, bottom -. height),
-      ~width=bucketSize -. 1.,
+      ~width=bucketSize,
       ~height,
       env,
     );
   };
-  {...state, time: state.time +. dt, hann, hamming};
+  {...state, time: state.time +. dt, hann, hamming, frequency, numberOfSines};
 };
 
 run(~setup, ~draw, ());
