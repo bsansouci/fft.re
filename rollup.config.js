@@ -4,7 +4,8 @@ export default {
   input: 'lib/es6/src/fft.js',
   output: {
     file: 'index.js',
-    format: 'iife'
+    format: 'umd',
+    name: 'fft'
   },
   name: 'MyModule',
   plugins: [resolve()]
