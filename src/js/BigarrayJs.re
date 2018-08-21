@@ -1,12 +1,12 @@
 /* Specialized implementation of Bigarray for float64. */
 
 type kind('a) =
-  | Float64: kind(float)
+  | Float32: kind(float)
   | Complex64: kind(Complex.t);
 type layout =
   | C_layout;
 
-let float64 = Float64;
+let float32 = Float32;
 let complex64 = Complex64;
 let c_layout = C_layout;
 
@@ -15,15 +15,15 @@ module Array1 = {
   [@bs.get] external dim : t('a) => int = "length";
 
   [@bs.new]
-  external createFloat64Array : (int) => t(float) =
-    "Float64Array";
+  external createFloat32Array : (int) => t(float) =
+    "Array";
 
   [@bs.new]
   external createComplexArray : int => t(Complex.t) = "Array";
 
   let create = (type a, kind: kind(a), _layout, size) : t(a) => {
     switch (kind) {
-    | Float64 => createFloat64Array(size)
+    | Float32 => createFloat32Array(size)
     | Complex64 => createComplexArray(size)
     }
   };

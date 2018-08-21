@@ -46,7 +46,7 @@ let fft = (~data, ~maxAmplitude, ()) => {
 
   let maxAmplitudeFrequency = ref(0.);
 
-  let spectrum = BA.create(MyBigarray.float64, MyBigarray.c_layout, m);
+  let spectrum = BA.create(MyBigarray.float32, MyBigarray.c_layout, m);
 
   /* Compute the amplitude of the output of the FFT */
   for (k in 0 to m - 1) {
@@ -151,7 +151,7 @@ let generateSine =
       ~numberOfSines=1,
       (),
     ) => {
-  let data = BA.create(MyBigarray.float64, MyBigarray.c_layout, size);
+  let data = BA.create(MyBigarray.float32, MyBigarray.c_layout, size);
   generateSineInplace(
     ~data,
     ~frequency,
