@@ -1,5 +1,6 @@
 {
   "name": "fft",
+  "ocaml-flags": ["-bin-annot"],
   "sources": ["example", {
     "dir": "src",
     "subdirs": {
@@ -7,6 +8,10 @@
       "backend": "js"
     }
   }],
+  "package-specs": {
+    "module": "es6",
+    "in-source": false
+  },
   "bs-dependencies": ["reprocessing", "reprocessing-ui"],
   "entries": [{
     "backend": "bytecode",
