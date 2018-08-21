@@ -38,8 +38,10 @@ let fft = (~data, ~maxAmplitude, ()) => {
   let m = BA.dim(data);
 
   let data_cp = BA.create(MyBigarray.complex64, MyBigarray.c_layout, m);
-  BA.blit(data, data_cp);
-
+  for (k in 0 to m - 1) {
+    BA.unsafe_set(data_cp, k, Complex.{re: BA.unsafe_get(data, k), im: 0.});
+  };
+  
   fftInplace(data_cp);
 
   let maxAmplitudeFrequency = ref(0.);
@@ -47,19 +49,19 @@ let fft = (~data, ~maxAmplitude, ()) => {
   let spectrum = BA.create(MyBigarray.float64, MyBigarray.c_layout, m);
 
   /* Compute the amplitude of the output of the FFT */
-  for (i in 0 to m - 1) {
-    BA.unsafe_set(spectrum, i, Complex.norm(BA.unsafe_get(data_cp, i)));
-    if (BA.unsafe_get(spectrum, i) > maxAmplitudeFrequency^) {
-      maxAmplitudeFrequency := BA.unsafe_get(spectrum, i);
+  for (k in 0 to m - 1) {
+    BA.unsafe_set(spectrum, k, Complex.norm(BA.unsafe_get(data_cp, k)));
+    if (BA.unsafe_get(spectrum, k) > maxAmplitudeFrequency^) {
+      maxAmplitudeFrequency := BA.unsafe_get(spectrum, k);
     };
   };
 
   /* Scale the fft amplitude graph by the max amplitude found before */
-  for (i in 0 to m - 1) {
+  for (k in 0 to m - 1) {
     BA.unsafe_set(
       spectrum,
-      i,
-      BA.unsafe_get(spectrum, i) /. maxAmplitudeFrequency^ *. maxAmplitude,
+      k,
+      BA.unsafe_get(spectrum, k) /. maxAmplitudeFrequency^ *. maxAmplitude,
     );
   };
 
@@ -71,19 +73,15 @@ let hannWindow = (~data, ~amount=1., ()) => {
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
     let multiplier = 0.5 -. 0.5 *. cos(two_pi *. float_of_int(i) /. total);
-    let com = BA.unsafe_get(data, i);
+    let cur = BA.unsafe_get(data, i);
     BA.unsafe_set(
       data,
       i,
-      {
-        Complex.re:
-          (1. -. amount)
-          *. com.Complex.re
+      (1. -. amount)
+          *. cur
           +. amount
-          *. com.Complex.re
+          *. cur
           *. multiplier,
-        im: com.Complex.im,
-      },
     );
   };
 };
@@ -93,19 +91,15 @@ let hammingWindow = (~data, ~amount=1., ()) => {
   let total = float_of_int(bucketSize - 1);
   for (i in 0 to bucketSize - 1) {
     let multiplier = 0.54 -. 0.46 *. cos(two_pi *. float_of_int(i) /. total);
-    let com = BA.unsafe_get(data, i);
+    let cur = BA.unsafe_get(data, i);
     BA.unsafe_set(
       data,
       i,
-      {
-        Complex.re:
-          (1. -. amount)
-          *. com.Complex.re
+      (1. -. amount)
+          *. cur
           +. amount
-          *. com.Complex.re
+          *. cur
           *. multiplier,
-        im: com.Complex.im,
-      },
     );
   };
 };
@@ -115,8 +109,8 @@ let getMaxAmplitude = data => {
   let size = BA.dim(data);
   for (i in 0 to size - 1) {
     let x = MyBigarray.Array1.get(data, i);
-    if (x.Complex.re > maxAmplitude^) {
-      maxAmplitude := x.Complex.re;
+    if (x > maxAmplitude^) {
+      maxAmplitude := x;
     };
   };
   maxAmplitude^;
@@ -144,7 +138,7 @@ let generateSineInplace =
            )
         /. coef;
     };
-    BA.unsafe_set(data, i, Complex.{re: x^, im: 0.});
+    BA.unsafe_set(data, i, x^);
   };
 };
 
@@ -157,7 +151,7 @@ let generateSine =
       ~numberOfSines=1,
       (),
     ) => {
-  let data = BA.create(MyBigarray.complex64, MyBigarray.c_layout, size);
+  let data = BA.create(MyBigarray.float64, MyBigarray.c_layout, size);
   generateSineInplace(
     ~data,
     ~frequency,

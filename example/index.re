@@ -114,13 +114,13 @@ let draw = (state, env) => {
       +. MyBigarray.Array1.get(
            data,
            int_of_float((f -. 1.) *. timeWindowSeconds),
-         ).Complex.re
+         )
       *. 100.,
     );
     let cur = (
       padding +. float_of_int(i) *. 2.,
       150.
-      +. MyBigarray.Array1.get(data, int_of_float(f *. timeWindowSeconds)).Complex.re
+      +. MyBigarray.Array1.get(data, int_of_float(f *. timeWindowSeconds))
       *. 100.,
     );
     Draw.linef(~p1=prev, ~p2=cur, env);
