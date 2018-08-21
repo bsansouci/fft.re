@@ -1,6 +1,7 @@
 {
-  "name": "fft",
-  "version": "0.1.0",
+  "name": "fft.re",
+  "version": "0.1.1",
+  "main": "index.js",
   "scripts": {
     "build": "bsb -make-world -backend bytecode",
     "build:native": "bsb -make-world -backend native",
