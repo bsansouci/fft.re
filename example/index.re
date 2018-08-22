@@ -79,7 +79,7 @@ let draw = (state, env) => {
   | _ => ()
   };
 
-  let spectrum = Fft.fft(~data, ~maxAmplitude, ());
+  let spectrum = Fft.fft(~data, ~maxAmplitude, ~samplingRate);
 
   /* Hamming option */
   let hamming = {
@@ -95,7 +95,7 @@ let draw = (state, env) => {
   let padding = 10.;
   let bucketSize = 5.;
   let j = int_of_float((float_of_int(mx) -. padding) /. bucketSize);
-  if (j >= 0 && j < fftBinSize) {
+  if (j >= 0 && j < samplingRate / 2) {
     Draw.text(
       ~body=
         Printf.sprintf("%dHz - %f", j, MyBigarray.Array1.get(spectrum, j)),
@@ -127,7 +127,7 @@ let draw = (state, env) => {
   };
   Draw.noStroke(env);
   let bottom = 600.;
-  for (i in 0 to fftBinSize / 2 - 1) {
+  for (i in 0 to samplingRate / 2 - 1) {
     let height = MyBigarray.Array1.get(spectrum, i) *. 400.;
     if (i == j) {
       Draw.fill(Utils.color(~r=255, ~g=255, ~b=255, ~a=255), env);

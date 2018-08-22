@@ -9,10 +9,11 @@ The API has mutable and immutable APIs, for performance or simplicity respective
 ### Example
 ```reason
 let shouldApplyHammingWindow = false;
+let samplingRate = 8192;
 
 let data = Fft.generateSine(
   ~frequency=200.,
-  ~samplingRate=8192,
+  ~samplingRate,
   ~size=8192,
   (),
 );
@@ -26,7 +27,7 @@ if (shouldApplyHammingWindow) {
   Fft.hammingWindow(~data);
 };
 
-let spectrum = Fft.fft(~data, ~maxAmplitude, ());
+let spectrum = Fft.fft(~data, ~maxAmplitude, ~samplingRate);
 
 assert(abs_float(Fft.BA.get(spectrum, 200) -. 1.0) < 0.000001);
 ```
@@ -38,7 +39,8 @@ Performs an FFT on the given data and returns an array of floats representing th
 ```reason
 let fft = (
   ~data : MyBigarray.t(Complex.t), 
-  ~maxAmplitude: float
+  ~maxAmplitude: float,
+  ~samplingRate: float,
 ) => MyBigarray.t(float);
 ```
 

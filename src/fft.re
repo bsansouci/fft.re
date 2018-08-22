@@ -34,30 +34,45 @@ let rec fftInplace = complex => {
   };
 };
 
-let fft = (~data, ~maxAmplitude, ()) => {
+let fft = (~data, ~maxAmplitude, ~samplingRate) => {
   let m = BA.dim(data);
 
   let data_cp = BA.create(MyBigarray.complex64, MyBigarray.c_layout, m);
   for (k in 0 to m - 1) {
     BA.unsafe_set(data_cp, k, Complex.{re: BA.unsafe_get(data, k), im: 0.});
   };
-  
+
   fftInplace(data_cp);
 
   let maxAmplitudeFrequency = ref(0.);
 
-  let spectrum = BA.create(MyBigarray.float32, MyBigarray.c_layout, m);
-
-  /* Compute the amplitude of the output of the FFT */
+  let spectrumSize = samplingRate;
+  let spectrum =
+    BA.create(MyBigarray.float32, MyBigarray.c_layout, spectrumSize);
+  let freqPerBin = float_of_int(samplingRate) /. float_of_int(m);
+  let prevFreq = ref(0);
+  let avg = ref(0.);
+  let numberOfPoints = ref(0.);
+  /* Put spectrum into single Hz buckets by simply averaging over the points in the buckets.
+     Also find the max amplitude of the output of the FFT. */
   for (k in 0 to m - 1) {
-    BA.unsafe_set(spectrum, k, Complex.norm(BA.unsafe_get(data_cp, k)));
-    if (BA.unsafe_get(spectrum, k) > maxAmplitudeFrequency^) {
-      maxAmplitudeFrequency := BA.unsafe_get(spectrum, k);
+    let nthFreq = int_of_float(float_of_int(k) *. freqPerBin);
+    if (nthFreq > prevFreq^) {
+      let amplitude = avg^ /. numberOfPoints^;
+      BA.unsafe_set(spectrum, prevFreq^, amplitude);
+      if (amplitude > maxAmplitudeFrequency^) {
+        maxAmplitudeFrequency := amplitude;
+      };
+      avg := 0.;
+      numberOfPoints := 0.;
+      prevFreq := nthFreq;
     };
+    avg := avg^ +. Complex.norm(BA.unsafe_get(data_cp, k));
+    numberOfPoints := numberOfPoints^ +. 1.;
   };
 
   /* Scale the fft amplitude graph by the max amplitude found before */
-  for (k in 0 to m - 1) {
+  for (k in 0 to spectrumSize - 1) {
     BA.unsafe_set(
       spectrum,
       k,
@@ -77,11 +92,7 @@ let hannWindow = (~data, ~amount=1., ()) => {
     BA.unsafe_set(
       data,
       i,
-      (1. -. amount)
-          *. cur
-          +. amount
-          *. cur
-          *. multiplier,
+      (1. -. amount) *. cur +. amount *. cur *. multiplier,
     );
   };
 };
@@ -95,11 +106,7 @@ let hammingWindow = (~data, ~amount=1., ()) => {
     BA.unsafe_set(
       data,
       i,
-      (1. -. amount)
-          *. cur
-          +. amount
-          *. cur
-          *. multiplier,
+      (1. -. amount) *. cur +. amount *. cur *. multiplier,
     );
   };
 };
