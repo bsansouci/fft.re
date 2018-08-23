@@ -44,31 +44,30 @@ let fft = (~data, ~maxAmplitude, ~samplingRate) => {
 
   fftInplace(data_cp);
 
-  let maxAmplitudeFrequency = ref(0.);
+  let maxFrequency = ref(0.);
 
   let spectrumSize = samplingRate;
   let spectrum =
     BA.create(MyBigarray.float32, MyBigarray.c_layout, spectrumSize);
   let freqPerBin = float_of_int(samplingRate) /. float_of_int(m);
   let prevFreq = ref(0);
-  let avg = ref(0.);
-  let numberOfPoints = ref(0.);
+  let maxFrequencyInBucket = ref(0.);
   /* Put spectrum into single Hz buckets by simply averaging over the points in the buckets.
      Also find the max amplitude of the output of the FFT. */
   for (k in 0 to m - 1) {
     let nthFreq = int_of_float(float_of_int(k) *. freqPerBin);
     if (nthFreq > prevFreq^) {
-      let amplitude = avg^ /. numberOfPoints^;
-      BA.unsafe_set(spectrum, prevFreq^, amplitude);
-      if (amplitude > maxAmplitudeFrequency^) {
-        maxAmplitudeFrequency := amplitude;
+      BA.unsafe_set(spectrum, prevFreq^, maxFrequencyInBucket^);
+      if (maxFrequencyInBucket^ > maxFrequency^) {
+        maxFrequency := maxFrequencyInBucket^;
       };
-      avg := 0.;
-      numberOfPoints := 0.;
+      maxFrequencyInBucket := 0.;
       prevFreq := nthFreq;
     };
-    avg := avg^ +. Complex.norm(BA.unsafe_get(data_cp, k));
-    numberOfPoints := numberOfPoints^ +. 1.;
+    let currentAmplitude = Complex.norm(BA.unsafe_get(data_cp, k));
+    if (maxFrequencyInBucket^ < currentAmplitude) {
+      maxFrequencyInBucket := currentAmplitude;
+    };
   };
 
   /* Scale the fft amplitude graph by the max amplitude found before */
@@ -76,7 +75,7 @@ let fft = (~data, ~maxAmplitude, ~samplingRate) => {
     BA.unsafe_set(
       spectrum,
       k,
-      BA.unsafe_get(spectrum, k) /. maxAmplitudeFrequency^ *. maxAmplitude,
+      BA.unsafe_get(spectrum, k) /. maxFrequency^ *. maxAmplitude,
     );
   };
 
