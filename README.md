@@ -14,7 +14,7 @@ let samplingRate = 8192;
 let data = Fft.generateSine(
   ~frequency=200.,
   ~samplingRate,
-  ~size=8192,
+  ~size=samplingRate * 3, /* 3 seconds long */
   (),
 );
 
