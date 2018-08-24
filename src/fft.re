@@ -46,7 +46,7 @@ let fft = (~data, ~maxAmplitude, ~samplingRate) => {
 
   let maxFrequency = ref(0.);
 
-  let spectrumSize = samplingRate;
+  let spectrumSize = samplingRate / 2;
   let spectrum =
     BA.create(MyBigarray.float32, MyBigarray.c_layout, spectrumSize);
   let freqPerBin = float_of_int(samplingRate) /. float_of_int(m);
@@ -54,7 +54,7 @@ let fft = (~data, ~maxAmplitude, ~samplingRate) => {
   let maxFrequencyInBucket = ref(0.);
   /* Put spectrum into single Hz buckets by simply averaging over the points in the buckets.
      Also find the max amplitude of the output of the FFT. */
-  for (k in 0 to m - 1) {
+  for (k in 0 to m / 2 - 1) {
     let nthFreq = int_of_float(float_of_int(k) *. freqPerBin);
     if (nthFreq > prevFreq^) {
       BA.unsafe_set(spectrum, prevFreq^, maxFrequencyInBucket^);
